@@ -1,6 +1,4 @@
-﻿using Common.Database;
-using Common.Resources.Proto;
-using Common.Utils.ExcelReader;
+﻿using Common.Resources.Proto;
 
 namespace PemukulPaku.GameServer.Handlers.Openworld
 {
@@ -10,12 +8,6 @@ namespace PemukulPaku.GameServer.Handlers.Openworld
         public void Handle(Session session, Packet packet)
         {
             TakeOpenworldCycleFinishRewardReq Data = packet.GetDecodedBody<TakeOpenworldCycleFinishRewardReq>();
-            OpenWorldScheme? ow = session.Player.OpenWorlds.Where(x => x.MapId == Data.MapId).FirstOrDefault();
-            if (ow is not null)
-            {
-                ow.Cycle = OpenWorldCycleData.GetInstance().GetNextCycle(Data.MapId, Data.Cycle);
-                ow.HasTakeFinishRewardCycle = OpenWorldCycleData.GetInstance().GetNextCycle(Data.MapId, Data.Cycle);
-            }
 
             session.Send(Packet.FromProto(new TakeOpenworldCycleFinishRewardRsp()
             {
