@@ -23,15 +23,8 @@ namespace PemukulPaku.GameServer.Game
         {
             User.Save();
             Equipment.Save();
-
-            foreach (AvatarScheme Avatar in AvatarList)
-            {
-                Avatar.Save();
-            }
-            foreach (OpenWorldScheme OpenWorld in OpenWorlds)
-            {
-                OpenWorld.Save();
-            }
+            Common.Database.Avatar.SaveBulk(AvatarList);
+            OpenWorld.SaveBulk(OpenWorlds);
         }
 
         public void ResetAvatarsTodayGoodfeel() 

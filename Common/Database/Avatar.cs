@@ -1,6 +1,5 @@
 ﻿using Common.Resources.Proto;
 using Common.Utils.ExcelReader;
-using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -62,6 +61,18 @@ namespace Common.Database
 
             return avatar;
         }
+
+        public static void SaveBulk(IEnumerable<AvatarScheme> avatars)
+        {
+            List<WriteModel<AvatarScheme>> ops = new();
+
+            foreach (AvatarScheme avatar in avatars)
+            {
+                ops.Add(avatar.SaveOp());
+            }
+
+            collection.BulkWrite(ops);
+        }
     }
 
     public class AvatarScheme : Resources.Proto.Avatar
@@ -75,10 +86,14 @@ namespace Common.Database
         public uint OwnerUid { get; set; }
         public new List<AvatarSkill> SkillLists { get; set; } = new();
 
-
         public void Save()
         {
             Avatar.collection.ReplaceOne(Builders<AvatarScheme>.Filter.Eq(avatar => avatar.Id, Id), this);
+        }
+
+        public WriteModel<AvatarScheme> SaveOp()
+        {
+            return new ReplaceOneModel<AvatarScheme>(Builders<AvatarScheme>.Filter.Eq(avatar => avatar.Id, Id), this);
         }
 
         public PlayerLevelData.LevelData AddExp(uint exp)

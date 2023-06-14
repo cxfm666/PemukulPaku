@@ -33,6 +33,18 @@ namespace Common.Database
             InitData(uid);
             return collection.AsQueryable().Where(x => x.OwnerUid == uid && ShowMapList.Contains(x.MapId)).ToList(); ;
         }
+
+        public static void SaveBulk(IEnumerable<OpenWorldScheme> openWorlds)
+        {
+            List<WriteModel<OpenWorldScheme>> ops = new();
+
+            foreach (OpenWorldScheme ow in openWorlds)
+            {
+                ops.Add(ow.SaveOp());
+            }
+
+            collection.BulkWrite(ops);
+        }
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -49,6 +61,11 @@ namespace Common.Database
         public void Save()
         {
             OpenWorld.collection.ReplaceOne(Builders<OpenWorldScheme>.Filter.Eq(x => x.Id, Id), this);
+        }
+
+        public WriteModel<OpenWorldScheme> SaveOp()
+        {
+            return new ReplaceOneModel<OpenWorldScheme>(Builders<OpenWorldScheme>.Filter.Eq(x => x.Id, Id), this);
         }
     }
 }
