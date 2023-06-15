@@ -109,7 +109,7 @@ namespace PemukulPaku.GameServer
 
         public static void LoadPacketHandlers()
         {
-            c.Log("Loading Packet Handlers...");
+            c.Log("载入数据包 Handlers...");
 
             IEnumerable<Type> classes = from t in Assembly.GetExecutingAssembly().GetTypes()
                                         select t;
@@ -123,11 +123,11 @@ namespace PemukulPaku.GameServer
             {
                 Handlers.Add(attr.Id, (IPacketHandler)Activator.CreateInstance(t)!);
 #if DEBUG
-                c.Log($"Loaded PacketHandler {t.Name} for Packet Type {attr.Id}");
+                c.Log($"载入 PacketHandler {t.Name} 来自包 {attr.Id}");
 #endif
             }
 
-            c.Log("Finished Loading Packet Handlers");
+            c.Log("全部数据包 Handlers加载完成！");
         }
 
         public static IPacketHandler? GetPacketHandler(CmdId cmdId)

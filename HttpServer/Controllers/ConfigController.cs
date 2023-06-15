@@ -1,11 +1,14 @@
 ﻿using Common;
 using HttpServer.Models;
 using Newtonsoft.Json;
+using Common.Utils;
+using System.Text;
 
 namespace HttpServer.Controllers
 {
     public class ConfigController
     {
+        private static readonly Logger c = new("HTTP", ConsoleColor.Green);
         public static void AddHandlers(WebApplication app)
         {
             app.Map("/{game_biz}/mdk/agreement/api/getAgreementInfos", (HttpContext ctx) =>
@@ -199,12 +202,34 @@ namespace HttpServer.Controllers
                 return ctx.Response.WriteAsync("GET LOG");
             });
 
-            app.Map("/admin/mi18n/{*remainder}", (ctx) =>
+
+            app.Map("/admin/mi18n/{*remainder}", async (ctx) =>
             {
-                return ctx.Response.WriteAsJsonAsync(new
+                var dataFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "data");
+
+                if (!Directory.Exists(dataFolderPath))
                 {
-                    version = 74
-                });
+                    Directory.CreateDirectory(dataFolderPath);
+                    c.Log("未找到数据文件夹。已自动创建。");
+                }
+
+                var filePath = Path.Combine(dataFolderPath, ctx.Request.Path.Value.Replace("/admin/mi18n/", ""));
+
+                if (File.Exists(filePath))
+                {
+                    var fileContent = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+                    ctx.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                    await ctx.Response.WriteAsync(fileContent);
+                }
+                else
+                {
+                    ctx.Response.StatusCode = 404;
+                    ctx.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                    await ctx.Response.WriteAsync("未找到文件");
+
+                    var relativePath = Path.GetRelativePath(Directory.GetCurrentDirectory(), filePath);
+                    c.Log("请求的文件未找到。路径：", relativePath);
+                }
             });
 
             app.Map("/sdk/dataUpload", (ctx) =>

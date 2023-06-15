@@ -30,21 +30,21 @@ namespace PemukulPaku.GameServer
                 try
                 {
                     Listener.Start();
-                    c.Log($"TCP server started on port {Global.config.Gameserver.Port}");
+                    c.Log($"TCP 服务器已在 {Global.config.Gameserver.Port} 端口上启动！");
 
                     while (true)
                     {
                         TcpClient Client = Listener.AcceptTcpClient();
                         string Id = Client.Client.RemoteEndPoint!.ToString()!;
 
-                        c.Warn($"{Id} connected");
+                        c.Warn($"{Id} 已连接");
                         Sessions.Add(Id, new Session(Id, Client));
                         LogClients();
                     }
                 }
                 catch (Exception ex)
                 {
-                    c.Error("TCP server error: " + ex.Message);
+                    c.Error("TCP 服务器错误: " + ex.Message);
                     Thread.Sleep(3000);
                 }
             }
@@ -52,7 +52,7 @@ namespace PemukulPaku.GameServer
 
         public void LogClients()
         {
-            c.Log($"Connected clients: {Sessions.Count}");
+            c.Log($"已连接的客户端: {Sessions.Count}");
         }
     }
 }

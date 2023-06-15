@@ -25,7 +25,7 @@ namespace HttpServer
             ConfigController.AddHandlers(app);
 
             app.UseMiddleware<RequestLoggingMiddleware>();
-            c.Log($"HTTP server started on port 80 & 443"); // A lie
+            c.Log($"HTTP 服务器已在 {Global.config.Http.HttpPort} & {Global.config.Http.HttpsPort} 上启动"); // A lie
             app.Run();
         }
 
@@ -49,10 +49,15 @@ namespace HttpServer
                 {
                     if ((int)Global.config.VerboseLevel > (int)VerboseLevel.Normal)
                     {
+#if DEBUG
                         c.Log($"{context.Response.StatusCode} {context.Request.Method.ToUpper()} {context.Request.Path}");
-                    }else if(((int)Global.config.VerboseLevel > (int)VerboseLevel.Silent) && !SurpressedRoutes.Contains(context.Request.Path.ToString()))
+#endif
+                    }
+                    else if(((int)Global.config.VerboseLevel > (int)VerboseLevel.Silent) && !SurpressedRoutes.Contains(context.Request.Path.ToString()))
                     {
+#if DEBUG
                         c.Log($"{context.Response.StatusCode} {context.Request.Method.ToUpper()} {context.Request.Path}");
+#endif
                     }
                 }
             }

@@ -34,7 +34,7 @@
                             else if(session != null)
                             {
                                 Cmd.Run(session, args.ToArray());
-                                Command.c.Log("Command executed");
+                                Command.c.Log("命令执行成功！");
                             }
                             else
                             {
@@ -50,7 +50,7 @@
                     }
                     else
                     {
-                        Command.c.Error("Command not found, try using help");
+                        Command.c.Error("命令未找到，请使用help查看帮助");
                     }
                 }
             }

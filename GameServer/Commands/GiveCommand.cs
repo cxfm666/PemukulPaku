@@ -26,6 +26,9 @@ namespace PemukulPaku.GameServer.Commands
 
             switch (action)
             {
+                case "all":
+                    GiveAll(player, 0);
+                    break;
                 case "avatars":
                 case "characters":
                 case "chars":
@@ -121,10 +124,57 @@ namespace PemukulPaku.GameServer.Commands
                     }
                     break;
                 default:
-                    throw new ArgumentException("Unrecognized action");
+                    throw new ArgumentException("无效的操作");
+            }
+            player.User.Save();
+        }
+
+        private void GiveAll(Player player, int? value)
+        {
+            foreach (AvatarDataExcel avatarData in AvatarData.GetInstance().All)
+            {
+                if (avatarData.AvatarId >= 9000 || avatarData.AvatarId == 316) continue;
+
+                AvatarScheme avatar = Common.Database.Avatar.Create(avatarData.AvatarId, player.User.Uid, player.Equipment);
+                player.AvatarList = player.AvatarList.Append(avatar).ToArray();
             }
 
-            player.User.Save();
+            foreach (WeaponDataExcel weaponData in WeaponData.GetInstance().All)
+            {
+                if (weaponData.EvoId == 0)
+                {
+                    Weapon weapon = player.Equipment.AddWeapon(weaponData.Id);
+                    weapon.Level = value is not null && value <= 0 ? (uint)weaponData.MaxLv : value is not null ? (uint)value : (uint)weaponData.MaxLv;
+                }
+            }
+
+            foreach (StigmataDataExcel stigmataData in StigmataData.GetInstance().All)
+            {
+                if (stigmataData.EvoId == 0)
+                {
+                    Stigmata stigmata = player.Equipment.AddStigmata(stigmataData.Id);
+                    stigmata.Level = value is not null && value <= 0 ? (uint)stigmataData.MaxLv : value is not null ? (uint)value : (uint)stigmataData.MaxLv;
+                }
+            }
+
+            foreach (MaterialDataExcel materialData in MaterialData.GetInstance().All)
+            {
+                player.Equipment.AddMaterial(materialData.Id, value is not null && value != 0 ? (int)value : materialData.QuantityLimit);
+            }
+
+            foreach (DressDataExcel dressData in DressData.GetInstance().All)
+            {
+                foreach (int avatarId in dressData.AvatarIdList)
+                {
+                    AvatarScheme? avatar = player.AvatarList.ToList().Find(av => av.AvatarId == avatarId);
+
+                    if (avatar is not null)
+                    {
+                        avatar.DressLists = avatar.DressLists.Append((uint)dressData.DressId).ToArray();
+                        avatar.Save();
+                    }
+                }
+            }
         }
     }
 }

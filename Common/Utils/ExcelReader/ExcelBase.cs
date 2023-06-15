@@ -18,7 +18,7 @@ namespace Common.Utils.ExcelReader
             {
                 (Instance as BaseExcelReader<Self, Scheme>).Load();
                 if((int)Global.config.VerboseLevel > 1)
-                    (Instance as BaseExcelReader<Self, Scheme>).c.Log($"{typeof(Self).Name} Excel Loaded From {(Instance as BaseExcelReader<Self, Scheme>).FileName}");
+                    (Instance as BaseExcelReader<Self, Scheme>).c.Log($"{typeof(Self).Name} 加载txt数据 {(Instance as BaseExcelReader<Self, Scheme>).FileName}");
             }
 
             return Instance;
@@ -26,7 +26,7 @@ namespace Common.Utils.ExcelReader
 
         public void Load()
         {
-            All = JsonConvert.DeserializeObject<Scheme[]>(File.ReadAllText($"Resources\\ExcelOutputAsset\\{FileName}")) ?? Array.Empty<Scheme>();
+            All = JsonConvert.DeserializeObject<Scheme[]>(File.ReadAllText($"Resources/ExcelOutputAsset/{FileName}")) ?? Array.Empty<Scheme>();
         }
 #pragma warning restore CS8618, CS8602 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }

@@ -8,12 +8,13 @@ namespace Common
     public static class Global
     {
         public static readonly IConfig config = new ConfigurationBuilder<IConfig>().UseJsonFile("config.json").Build();
-        public static readonly Logger c = new("Global");
+        public static readonly Logger c = new("全局配置");
 
         public static readonly MongoClient MongoClient = new(config.DatabaseUri);
-        public static readonly IMongoDatabase db = MongoClient.GetDatabase("PemukulPaku");
+        public static readonly IMongoDatabase db = MongoClient.GetDatabase(config.DatabaseName);
         public static long GetUnixInSeconds() => ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         public static uint GetRandomSeed() => (uint)(GetUnixInSeconds() * new Random().Next(1, 10) / 10);
+
     }
 
     public interface IConfig
@@ -29,6 +30,9 @@ namespace Common
 
         [Option(DefaultValue = "mongodb://127.0.0.1:27017/PemukulPaku")]
         string DatabaseUri { get; set; }
+
+        [Option(DefaultValue = "bh3")]
+        string DatabaseName { get; set; }
 
         [Option]
         IGameserver Gameserver { get; set; }
@@ -56,6 +60,11 @@ namespace Common
 
             [Option(DefaultValue = (uint)(443))]
             public uint HttpsPort { get; set; }
+
+            [Option(DefaultValue = "localhosts")]
+            public string Hosts { get; set; }
+
+
         }
     }
 

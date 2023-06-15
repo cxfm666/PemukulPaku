@@ -83,7 +83,7 @@ namespace PemukulPaku.GameServer.Commands
 
         public static void LoadCommandHandlers()
         {
-            c.Log("Loading Command Handlers...");
+            c.Log("载入指令系统 Handlers...");
 
             IEnumerable<Type> classes = from t in Assembly.GetExecutingAssembly().GetTypes()
                                         select t;
@@ -105,12 +105,12 @@ namespace PemukulPaku.GameServer.Commands
                     Commands.Add(cmd);
 
 #if DEBUG
-                    c.Log($"Loaded Command Handler {t.Name} for Command \"{cmd.Name}\"");
+                    c.Log($"载入 {t.Name} Handler 来自 \"{cmd.Name}\"的注册");
 #endif
                 }
             }
 
-            c.Log("Finished Loading Commands");
+            c.Log("全部指令加载完成！");
         }
     }
 }

@@ -40,11 +40,11 @@ namespace PemukulPaku.GameServer.Game.Chatrooms
                         {
                             Cmd.Run(session, args.ToArray());
                             if (Cmd.CmdType == CommandType.Player)
-                                SendAiMsg("Command executed", session);
+                                SendAiMsg("命令执行成功!", session);
                         }
                         else
                         {
-                            SendAiMsg("Invalid usage", session);
+                            SendAiMsg("无效操作！", session);
                         }
                     }
                     catch (Exception ex)
@@ -104,7 +104,7 @@ namespace PemukulPaku.GameServer.Game.Chatrooms
             ChatMsg AiMsg = new()
             {
                 Uid = 0,
-                Nickname = "Ai-chan",
+                Nickname = "天理崩坏3指令服",
                 Time = (uint)Global.GetUnixInSeconds(),
                 Msg = msg,
                 Content = new() { },

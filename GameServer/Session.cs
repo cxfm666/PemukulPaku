@@ -74,7 +74,7 @@ namespace PemukulPaku.GameServer
                             }
                             else
                             {
-                                c.Error("Invalid packet received:", BitConverter.ToString(packet).Replace("-", ""));
+                                c.Error("收到无效数据包！:", BitConverter.ToString(packet).Replace("-", ""));
                             }
                         }
                     }
@@ -113,8 +113,8 @@ namespace PemukulPaku.GameServer
                 return;
 
             Player.SaveAll();
-            c.Debug("Player data saved to database");
-            c.Warn($"{Id} disconnected");
+            c.Debug("玩家数据已保存至数据库");
+            c.Warn($"{Id} 断开连接");
 
             if (ReadLine.GetInstance().session == this) { ReadLine.GetInstance().session = null; }
             Server.GetInstance().Sessions.Remove(Id);
@@ -132,7 +132,7 @@ namespace PemukulPaku.GameServer
 
                 if (handler == null)
                 {
-                    c.Warn($"{PacketName} not handled!");
+                    c.Warn($"{PacketName} 未实装!");
                     return;
                 }
 
@@ -167,7 +167,7 @@ namespace PemukulPaku.GameServer
                 }
                 catch (Exception ex)
                 {
-                    c.Error($"Failed to send {PacketName}:" + ex.Message);
+                    c.Error($"无法发送数据包 {PacketName}:" + ex.Message);
                 }
             }
         }
