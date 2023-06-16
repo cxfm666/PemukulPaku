@@ -14,7 +14,6 @@ namespace Common
         public static readonly IMongoDatabase db = MongoClient.GetDatabase(config.DatabaseName);
         public static long GetUnixInSeconds() => ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         public static uint GetRandomSeed() => (uint)(GetUnixInSeconds() * new Random().Next(1, 10) / 10);
-
     }
 
     public interface IConfig
@@ -63,7 +62,6 @@ namespace Common
 
             [Option(DefaultValue = "localhosts")]
             public string Hosts { get; set; }
-
 
         }
     }

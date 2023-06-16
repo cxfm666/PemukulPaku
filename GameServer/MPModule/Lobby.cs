@@ -31,21 +31,61 @@ namespace PemukulPaku.GameServer.MPModule
 
             MpTeamSyncNotify teamSyncNotify = new()
             {
-                TeamData = new()
-                {
-                     LeaderUid = team.LeaderUid,
-                     TeamId = teamId,
-                     LobbyEnterType = team.LobbyEnterType,
-                     LobbyStatus = team.LobbyStatus,
-                     MinLevel = team.MinLevel,
-                     MaxLevel = 0,
-                     StageId = team.StageId,
-                     TeamName = team.Name,
-                     Status = MpTeamStatus.TeamStatusInLobby
-                }
+                TeamData = team.GetMpTeamData()
             };
 
-            teamSyncNotify.TeamData.MemberLists.AddRange(team.Members.Select(member =>
+            foreach (Session? session in team.Members.Where(x => x.Session is not null).Select(x => x.Session))
+            {
+                session?.Send(Packet.FromProto(teamSyncNotify, CmdId.MpTeamSyncNotify));
+            }
+        }
+    }
+
+    public class Team
+    {
+        public uint StageId { get; set; }
+        public uint MinLevel;
+        public uint LeaderUid;
+        public LobbyEnterType LobbyEnterType;
+        public LobbyStatus LobbyStatus = LobbyStatus.LobbyPreparing;
+        public List<TeamMember> Members;
+        public string Name;
+
+        public Team(uint stageId, uint minLevel, LobbyEnterType lobbyEnterType, in Session leader, string name)
+        {
+            StageId = stageId;
+            MinLevel = minLevel;
+            LobbyEnterType = lobbyEnterType;
+            Members = new List<TeamMember> { new(leader), new(null, 2), new(null, 3) };
+            LeaderUid = leader.Player.User.Uid;
+            Name = name;
+        }
+
+        public void Join(Session session)
+        {
+            if (Members[1].Session is null)
+                Members[1].Session = session;
+            else if (Members[2].Session is null)
+                Members[2].Session = session;
+
+            Lobby.GetInstance().SyncTeam(LeaderUid);
+        }
+
+        public MpTeamData GetMpTeamData()
+        {
+            MpTeamData teamData = new()
+            {
+                LeaderUid = LeaderUid,
+                TeamId = LeaderUid,
+                LobbyEnterType = LobbyEnterType,
+                LobbyStatus = LobbyStatus,
+                MinLevel = MinLevel,
+                MaxLevel = 0,
+                StageId = StageId,
+                TeamName = Name,
+                Status = MpTeamStatus.TeamStatusInLobby
+            };
+            teamData.MemberLists.AddRange(Members.Select(member =>
             {
                 if (member.Session is null)
                     return new MpTeamMember() { Index = member.Index, DressId = 0 };
@@ -75,31 +115,12 @@ namespace PemukulPaku.GameServer.MPModule
                 };
             }));
 
-            foreach (Session? session in team.Members.Where(x => x.Session is not null).Select(x => x.Session))
-            {
-                session?.Send(Packet.FromProto(teamSyncNotify, CmdId.MpTeamSyncNotify));
-            }
+            return teamData;
         }
-    }
 
-    public class Team
-    {
-        public uint StageId { get; set; }
-        public uint MinLevel;
-        public uint LeaderUid;
-        public LobbyEnterType LobbyEnterType;
-        public LobbyStatus LobbyStatus = LobbyStatus.LobbyPreparing;
-        public List<TeamMember> Members;
-        public string Name;
-
-        public Team(uint stageId, uint minLevel, LobbyEnterType lobbyEnterType, in Session leader, string name)
+        public override string ToString()
         {
-            StageId = stageId;
-            MinLevel = minLevel;
-            LobbyEnterType = lobbyEnterType;
-            Members = new List<TeamMember> { new(leader), new(null, 2), new(null, 3) };
-            LeaderUid = leader.Player.User.Uid;
-            Name = name;
+            return Name;
         }
     }
 
